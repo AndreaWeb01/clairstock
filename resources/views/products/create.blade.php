@@ -1,0 +1,2 @@
+@extends('layouts.app', ['title' => 'Nouveau produit'])
+@section('content')<div class="mb-4"><a href="{{ route('products.index') }}" class="small text-decoration-none"><i class="bi bi-arrow-left me-1"></i>Retour aux produits</a><h1 class="h3 fw-bold mt-2 mb-1">Nouveau produit</h1><p class="muted mb-0">Les champs marqués sont nécessaires pour créer la fiche.</p></div><div class="panel p-4"><form method="POST" action="{{ route('products.store') }}" enctype="multipart/form-data">@csrf @include('products._form', ['submitLabel' => 'Créer le produit'])</form></div>@endsection

@@ -1,0 +1,2 @@
+@extends('layouts.app', ['title' => 'Nouvelle catégorie'])
+@section('content')<div class="mb-4"><a href="{{ route('categories.index') }}" class="small text-decoration-none"><i class="bi bi-arrow-left me-1"></i>Retour aux catégories</a><h1 class="h3 fw-bold mt-2 mb-1">Nouvelle catégorie</h1><p class="muted mb-0">Ajoutez une famille de produits au catalogue.</p></div><div class="panel p-4" style="max-width:760px"><form method="POST" action="{{ route('categories.store') }}">@csrf @include('categories._form', ['submitLabel' => 'Créer la catégorie'])</form></div>@endsection
