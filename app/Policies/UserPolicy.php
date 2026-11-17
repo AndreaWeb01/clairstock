@@ -26,8 +26,4 @@ class UserPolicy
         return $user->isAdmin() || $user->is($target);
     }
 
-    public function delete(User $user, User $target): bool
-    {
-        return $user->isAdmin() && ! $user->is($target);
-    }
 }

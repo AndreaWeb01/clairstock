@@ -22,6 +22,7 @@ class ExpenseRequest extends FormRequest
             'spent_at' => ['required', 'date', 'before_or_equal:today'],
             'payment_method' => ['nullable', 'in:cash,card,transfer,mobile_money,other'],
             'receipt' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+            'is_active' => ['sometimes', 'required', 'boolean'],
         ];
     }
 

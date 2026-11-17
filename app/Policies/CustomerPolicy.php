@@ -11,5 +11,4 @@ class CustomerPolicy
     public function view(User $user, Customer $customer): bool { return true; }
     public function create(User $user): bool { return true; }
     public function update(User $user, Customer $customer): bool { return $user->isAdmin(); }
-    public function delete(User $user, Customer $customer): bool { return $user->isAdmin(); }
 }

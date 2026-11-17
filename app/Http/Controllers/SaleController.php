@@ -25,7 +25,7 @@ class SaleController extends Controller
     public function create(): View
     {
         $this->authorize('create', Sale::class);
-        return view('sales.create', ['customers' => Customer::orderBy('name')->get(), 'products' => Product::where('status', 'active')->orderBy('name')->get()]);
+        return view('sales.create', ['customers' => Customer::where('is_active', true)->orderBy('name')->get(), 'products' => Product::where('status', 'active')->orderBy('name')->get()]);
     }
 
     public function store(StoreSaleRequest $request, SaleService $service): RedirectResponse

@@ -21,15 +21,15 @@ Route::get('/', function () {
 
 require __DIR__.'/auth.php';
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
 
-    Route::resource('products', ProductController::class);
-    Route::resource('categories', CategoryController::class)->except('show');
-    Route::resource('customers', CustomerController::class)->except('show');
-    Route::resource('suppliers', SupplierController::class)->except('show');
+    Route::resource('products', ProductController::class)->except('destroy');
+    Route::resource('categories', CategoryController::class)->except(['show', 'destroy']);
+    Route::resource('customers', CustomerController::class)->except(['show', 'destroy']);
+    Route::resource('suppliers', SupplierController::class)->except(['show', 'destroy']);
     Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
     Route::get('/sales/create', [SaleController::class, 'create'])->name('sales.create');
     Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
@@ -44,16 +44,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/purchases/{purchase}/receive', [PurchaseController::class, 'receive'])->name('purchases.receive');
     Route::post('/purchases/{purchase}/cancel', [PurchaseController::class, 'cancel'])->name('purchases.cancel');
     Route::post('/purchases/{purchase}/payments', [PaymentController::class, 'storePurchase'])->name('purchases.payments.store');
-    Route::resource('expenses', ExpenseController::class)->except('show');
+    Route::resource('expenses', ExpenseController::class)->except(['show', 'destroy']);
     Route::get('/stock', [StockController::class, 'index'])->name('stock.index');
     Route::get('/stock/movements', [StockController::class, 'movements'])->name('stock.movements');
     Route::post('/stock/movements', [StockController::class, 'storeMovement'])->name('stock.movements.store');
 });
 
-Route::middleware(['auth', 'role:administrateur'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'active', 'role:administrateur'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [\App\Http\Controllers\Admin\UserController::class, 'create'])->name('users.create');
     Route::post('/users', [\App\Http\Controllers\Admin\UserController::class, 'store'])->name('users.store');
+    Route::patch('/users/{user}/status', [\App\Http\Controllers\Admin\UserController::class, 'toggleStatus'])->name('users.toggle-status');
     Route::get('/settings', [SettingController::class, 'edit'])->name('settings');
     Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
     Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');

@@ -57,16 +57,4 @@ class CategoryController extends Controller
         return redirect()->route('categories.index')->with('status', 'Catégorie mise à jour avec succès.');
     }
 
-    public function destroy(Category $category): RedirectResponse
-    {
-        $this->authorize('delete', $category);
-
-        if ($category->products()->exists()) {
-            return back()->with('error', 'Cette catégorie est utilisée par des produits et ne peut pas être supprimée.');
-        }
-
-        $category->delete();
-
-        return redirect()->route('categories.index')->with('status', 'Catégorie supprimée avec succès.');
-    }
 }

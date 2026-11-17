@@ -25,7 +25,7 @@ class PurchaseController extends Controller
     public function create(): View
     {
         $this->authorize('create', Purchase::class);
-        return view('purchases.create', ['suppliers' => Supplier::orderBy('name')->get(), 'products' => Product::orderBy('name')->get()]);
+        return view('purchases.create', ['suppliers' => Supplier::where('is_active', true)->orderBy('name')->get(), 'products' => Product::where('status', 'active')->orderBy('name')->get()]);
     }
 
     public function store(StorePurchaseRequest $request, PurchaseService $service): RedirectResponse
@@ -44,8 +44,8 @@ class PurchaseController extends Controller
     {
         $this->authorize('update', $purchase);
         return view('purchases.create', [
-            'purchase' => $purchase->load('items'), 'editing' => true,
-            'suppliers' => Supplier::orderBy('name')->get(), 'products' => Product::orderBy('name')->get(),
+            'purchase' => $purchase->load(['items' => fn ($query) => $query->where('is_active', true)]), 'editing' => true,
+            'suppliers' => Supplier::where('is_active', true)->orWhereKey($purchase->supplier_id)->orderBy('name')->get(), 'products' => Product::orderBy('name')->get(),
         ]);
     }
 

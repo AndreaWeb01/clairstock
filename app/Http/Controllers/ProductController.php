@@ -7,7 +7,6 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use App\Services\SettingService;
 
@@ -51,7 +50,7 @@ class ProductController extends Controller
         $this->authorize('create', Product::class);
 
         return view('products.create', [
-            'product' => new Product(['unit' => 'piece', 'status' => 'active', 'minimum_stock' => $settings->get('default_minimum_stock', '0.000')]),
+            'product' => new Product(['unit' => 'piece', 'status' => 'active', 'minimum_stock' => $settings->get('default_minimum_stock', '0')]),
             'categories' => Category::where('is_active', true)->orderBy('name')->get(),
         ]);
     }
@@ -92,32 +91,11 @@ class ProductController extends Controller
     {
         $data = $request->safe()->except('image');
         if ($request->hasFile('image')) {
-            $previousImage = $product->image_path;
             $data['image_path'] = $request->file('image')->store('products', 'public');
-        } else {
-            $previousImage = null;
         }
         $product->update($data);
-        if ($previousImage) {
-            Storage::disk('public')->delete($previousImage);
-        }
 
         return redirect()->route('products.show', $product)->with('status', 'Produit mis à jour avec succès.');
     }
 
-    public function destroy(Product $product): RedirectResponse
-    {
-        $this->authorize('delete', $product);
-
-        if ($product->stockMovements()->exists() || $product->saleItems()->exists() || $product->purchaseItems()->exists()) {
-            return back()->with('error', 'Ce produit possède un historique de stock, de vente ou d’achat et ne peut pas être supprimé. Vous pouvez le désactiver.');
-        }
-
-        if ($product->image_path) {
-            Storage::disk('public')->delete($product->image_path);
-        }
-        $product->delete();
-
-        return redirect()->route('products.index')->with('status', 'Produit supprimé avec succès.');
-    }
 }

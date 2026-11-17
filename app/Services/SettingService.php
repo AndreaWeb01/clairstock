@@ -12,7 +12,7 @@ class SettingService
     public const DEFAULTS = [
         'business_name' => 'ClairStock', 'business_phone' => '', 'business_email' => '',
         'business_address' => '', 'business_country' => '', 'currency' => 'FCFA',
-        'date_format' => 'd/m/Y', 'default_minimum_stock' => '0.000', 'business_logo_path' => '',
+        'date_format' => 'd/m/Y', 'default_minimum_stock' => '0', 'business_logo_path' => '',
     ];
 
     public function all(): array

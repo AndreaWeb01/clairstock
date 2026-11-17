@@ -27,7 +27,11 @@ class StockService
             throw new InvalidArgumentException('Type de mouvement de stock inconnu.');
         }
 
-        $quantityUnits = $this->toUnits($quantity);
+        $quantityText = trim((string) $quantity);
+        if (! preg_match('/^\d{1,9}$/', $quantityText)) {
+            throw ValidationException::withMessages(['quantity' => 'La quantité doit être un nombre entier.']);
+        }
+        $quantityUnits = (int) $quantityText * self::SCALE;
         if ($quantityUnits <= 0) {
             throw ValidationException::withMessages(['quantity' => 'La quantité doit être supérieure à zéro.']);
         }
@@ -73,7 +77,7 @@ class StockService
     {
         $value = trim((string) $value);
         if (! preg_match('/^\d{1,9}(?:\.\d{1,3})?$/', $value)) {
-            throw ValidationException::withMessages(['quantity' => 'La quantité doit comporter au maximum trois décimales.']);
+            throw ValidationException::withMessages(['quantity' => 'Le stock existant n’est pas au format attendu.']);
         }
 
         [$whole, $fraction] = array_pad(explode('.', $value, 2), 2, '');

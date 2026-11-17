@@ -26,7 +26,7 @@ class AuthenticatedSessionController extends Controller
             'password.required' => 'Veuillez saisir votre mot de passe.',
         ]);
 
-        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+        if (! Auth::attempt($credentials + ['is_active' => true], $request->boolean('remember'))) {
             return back()->withErrors(['email' => 'Ces identifiants ne correspondent à aucun compte.'])->onlyInput('email');
         }
 

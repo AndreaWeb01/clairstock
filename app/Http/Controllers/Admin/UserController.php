@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class UserController extends Controller
@@ -35,5 +36,22 @@ class UserController extends Controller
         User::create($data);
 
         return redirect()->route('admin.users.index')->with('status', 'Utilisateur créé avec succès.');
+    }
+
+    public function toggleStatus(Request $request, User $user): RedirectResponse
+    {
+        $this->authorize('update', $user);
+
+        if ($request->user()->is($user)) {
+            return back()->with('error', 'Vous ne pouvez pas désactiver votre propre compte.');
+        }
+
+        if ($user->isAdmin() && $user->is_active && User::query()->where('role_id', $user->role_id)->where('is_active', true)->count() <= 1) {
+            return back()->with('error', 'Le dernier administrateur actif ne peut pas être désactivé.');
+        }
+
+        $user->update(['is_active' => ! $user->is_active]);
+
+        return redirect()->route('admin.users.index')->with('status', $user->is_active ? 'Compte activé.' : 'Compte désactivé.');
     }
 }

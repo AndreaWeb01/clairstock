@@ -39,7 +39,7 @@ class DashboardService
             ->where('sales.status', 'completed')->whereDate('sales.sold_at', '>=', $monthStart->toDateString())->whereDate('sales.sold_at', '<=', $monthEnd->toDateString())
             ->selectRaw('COALESCE(SUM(sale_items.line_total - (sale_items.quantity * sale_items.unit_cost)), 0) as value')->value('value') ?? 0);
         $expensesMonth = $administrator
-            ? (float) Expense::query()->whereDate('spent_at', '>=', $monthStart->toDateString())->whereDate('spent_at', '<=', $monthEnd->toDateString())->sum('amount')
+            ? (float) Expense::query()->where('is_active', true)->whereDate('spent_at', '>=', $monthStart->toDateString())->whereDate('spent_at', '<=', $monthEnd->toDateString())->sum('amount')
             : 0.0;
 
         return [

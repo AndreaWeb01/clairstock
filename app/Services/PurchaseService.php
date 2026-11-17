@@ -67,7 +67,7 @@ class PurchaseService
     public function receive(Purchase $purchase, User $user): Purchase
     {
         return DB::transaction(function () use ($purchase, $user) {
-            $purchase = Purchase::query()->lockForUpdate()->with('items.product')->findOrFail($purchase->id);
+            $purchase = Purchase::query()->lockForUpdate()->with(['items' => fn ($query) => $query->where('is_active', true), 'items.product'])->findOrFail($purchase->id);
             $this->receiveWithinTransaction($purchase, $user);
             return $purchase->load(['supplier', 'items.product', 'user']);
         }, attempts: 3);
@@ -100,12 +100,16 @@ class PurchaseService
             }
             $total = $subtotal - $discount;
 
-            $purchase->items()->delete();
+            $productIds = collect($data['items'])->pluck('product_id')->all();
+            $purchase->items()->where('is_active', true)->whereNotIn('product_id', $productIds)->update(['is_active' => false]);
             foreach ($lines as [$product, $quantity, $unitCost, $lineTotal]) {
-                $purchase->items()->create([
+                $item = $purchase->items()->where('product_id', $product->id)->first();
+                $attributes = [
                     'product_id' => $product->id, 'product_name' => $product->name, 'sku' => $product->sku,
-                    'quantity' => $quantity, 'unit_cost' => $this->amount($unitCost), 'line_total' => $this->amount($lineTotal),
-                ]);
+                    'quantity' => $quantity, 'unit_cost' => $this->amount($unitCost), 'line_total' => $this->amount($lineTotal), 'is_active' => true,
+                ];
+                if ($item) $item->update($attributes);
+                else $purchase->items()->create($attributes);
             }
             $purchase->update([
                 'supplier_id' => $data['supplier_id'], 'purchased_at' => $data['purchased_at'],
@@ -120,7 +124,7 @@ class PurchaseService
     public function cancel(Purchase $purchase, User $user): Purchase
     {
         return DB::transaction(function () use ($purchase, $user) {
-            $purchase = Purchase::query()->lockForUpdate()->with('items.product')->findOrFail($purchase->id);
+            $purchase = Purchase::query()->lockForUpdate()->with(['items' => fn ($query) => $query->where('is_active', true), 'items.product'])->findOrFail($purchase->id);
             if ($this->cents($purchase->amount_paid) > 0) {
                 throw ValidationException::withMessages(['purchase' => 'Cet achat comporte déjà un paiement. Enregistrez d’abord le remboursement ou l’avoir du fournisseur avant son annulation.']);
             }
@@ -141,7 +145,7 @@ class PurchaseService
         if ($purchase->status !== 'draft') {
             throw ValidationException::withMessages(['purchase' => 'Seul un brouillon peut être réceptionné.']);
         }
-        foreach ($purchase->items as $item) {
+        foreach ($purchase->items->where('is_active', true) as $item) {
             $this->stock->record($item->product, 'purchase', $item->quantity, $user, 'Réception achat '.$purchase->number, $purchase);
             $item->product->update(['purchase_price' => $item->unit_cost]);
         }

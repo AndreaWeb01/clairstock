@@ -11,5 +11,4 @@ class ExpensePolicy
     public function view(User $user, Expense $expense): bool { return $user->isAdmin(); }
     public function create(User $user): bool { return $user->isAdmin(); }
     public function update(User $user, Expense $expense): bool { return $user->isAdmin(); }
-    public function delete(User $user, Expense $expense): bool { return $user->isAdmin(); }
 }

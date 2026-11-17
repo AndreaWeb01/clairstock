@@ -20,7 +20,7 @@ class ProductFactory extends Factory
             'unit' => fake()->randomElement(['piece', 'kg', 'litre', 'carton', 'paquet']),
             'purchase_price' => $purchasePrice,
             'sale_price' => round($purchasePrice * fake()->randomFloat(2, 1.15, 1.8), 2),
-            'minimum_stock' => fake()->randomFloat(3, 0, 25),
+            'minimum_stock' => fake()->numberBetween(0, 25),
             'status' => 'active',
         ];
     }

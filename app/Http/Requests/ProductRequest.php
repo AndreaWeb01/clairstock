@@ -33,7 +33,7 @@ class ProductRequest extends FormRequest
             'unit' => ['required', Rule::in(Product::UNITS)],
             'purchase_price' => ['required', 'numeric', 'gt:0', 'lte:9999999999999.99', 'decimal:0,2'],
             'sale_price' => ['required', 'numeric', 'gt:0', 'lte:9999999999999.99', 'decimal:0,2'],
-            'minimum_stock' => ['required', 'numeric', 'min:0', 'lte:999999999.999', 'decimal:0,3'],
+            'minimum_stock' => ['required', 'integer', 'min:0', 'max:999999999'],
             'status' => ['required', Rule::in(Product::STATUSES)],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ];
@@ -65,7 +65,7 @@ class ProductRequest extends FormRequest
             'minimum_stock.numeric' => 'Le seuil minimal doit être un nombre valide.',
             'minimum_stock.min' => 'Le seuil minimal ne peut pas être négatif.',
             'minimum_stock.lte' => 'Le seuil dépasse la quantité maximale autorisée.',
-            'minimum_stock.decimal' => 'Le seuil peut comporter au maximum trois décimales.',
+            'minimum_stock.integer' => 'Le seuil doit être un nombre entier.',
             'status.required' => 'Veuillez choisir un statut.',
             'status.in' => 'Le statut choisi est invalide.',
             'image.image' => 'Le fichier doit être une image.',

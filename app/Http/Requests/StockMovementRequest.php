@@ -17,7 +17,7 @@ class StockMovementRequest extends FormRequest
         return [
             'product_id' => ['required', Rule::exists('products', 'id')->where('status', 'active')],
             'movement_type' => ['required', Rule::in(['entry', 'exit', 'adjustment_positive', 'adjustment_negative'])],
-            'quantity' => ['required', 'numeric', 'gt:0', 'regex:/^\d{1,9}(?:\.\d{1,3})?$/'],
+            'quantity' => ['required', 'integer', 'min:1', 'max:999999999'],
             'reason' => ['required', 'string', 'min:3', 'max:500'],
         ];
     }
@@ -30,9 +30,8 @@ class StockMovementRequest extends FormRequest
             'movement_type.required' => 'Veuillez choisir le type de mouvement.',
             'movement_type.in' => 'Le type de mouvement choisi est invalide.',
             'quantity.required' => 'La quantité est obligatoire.',
-            'quantity.numeric' => 'La quantité doit être un nombre valide.',
-            'quantity.gt' => 'La quantité doit être supérieure à zéro.',
-            'quantity.regex' => 'La quantité peut comporter au maximum trois décimales.',
+            'quantity.integer' => 'La quantité doit être un nombre entier.',
+            'quantity.min' => 'La quantité doit être supérieure à zéro.',
             'reason.required' => 'Veuillez indiquer le motif du mouvement.',
             'reason.min' => 'Le motif doit contenir au moins 3 caractères.',
             'reason.max' => 'Le motif ne peut pas dépasser 500 caractères.',

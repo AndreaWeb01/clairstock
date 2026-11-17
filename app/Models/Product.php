@@ -24,8 +24,8 @@ class Product extends Model
         return [
             'purchase_price' => 'decimal:2',
             'sale_price' => 'decimal:2',
-            'stock_quantity' => 'decimal:3',
-            'minimum_stock' => 'decimal:3',
+            'stock_quantity' => 'decimal:0',
+            'minimum_stock' => 'decimal:0',
         ];
     }
 

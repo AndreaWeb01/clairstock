@@ -10,7 +10,9 @@ class Supplier extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'company', 'phone', 'email', 'address', 'city', 'country', 'notes'];
+    protected $fillable = ['name', 'company', 'phone', 'email', 'address', 'city', 'country', 'notes', 'is_active'];
+
+    protected function casts(): array { return ['is_active' => 'boolean']; }
 
     public function purchases(): HasMany { return $this->hasMany(Purchase::class); }
 }
